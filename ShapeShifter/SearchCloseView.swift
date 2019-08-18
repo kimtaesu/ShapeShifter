@@ -76,30 +76,77 @@ class SearchCloseView: UIView {
         self.layer.addSublayer(rightLineLayer)
     }
     func stopAnimation() {
-        print("stopAnimation")
+        CATransaction.begin()
+        if let ovalLayer = self.layer.first(name: "oval")  {
+            ovalLayer.removeAllAnimations()
+            let reverseTranslate = CABasicAnimation.createAnimationLayer(
+                withDuration: 0.3,
+                delay: 0,
+                animationKeyPath: "path",
+                fromValue: afterOvalPath.cgPath,
+                toValue: beginOvalPath.cgPath)
+            let reverseStrokeStart = CABasicAnimation.createAnimationLayer(
+                withDuration: 0.35,
+                delay: 0,
+                animationKeyPath: "strokeStart",
+                fromValue: 1,
+                toValue: 0)
+            ovalLayer.add(reverseTranslate, forKey: "translationOval")
+            ovalLayer.add(reverseStrokeStart, forKey: "strokeStart")
+        }
+        if let leftLine = self.layer.first(name: "left_line") {
+            leftLine.removeAllAnimations()
+            let reverseStrokeEnd = CABasicAnimation.createAnimationLayer(
+                withDuration: 0.3,
+                delay: 0,
+                animationKeyPath: "strokeEnd",
+                fromValue: 1,
+                toValue: 0)
+            leftLine.add(reverseStrokeEnd, forKey: "strokeEnd")
+        }
+        if let rightLine = self.layer.first(name: "right_line") {
+            rightLine.removeAllAnimations()
+            let reverseStrokeStart = CABasicAnimation.createAnimationLayer(
+                withDuration: 0.5,
+                delay: 0,
+                animationKeyPath: "strokeStart",
+                fromValue: 0,
+                toValue: 0.48)
+            let reverseStrokeEnd = CABasicAnimation.createAnimationLayer(
+                withDuration: 0.5,
+                delay: 0,
+                animationKeyPath: "strokeEnd",
+                fromValue: 0.80,
+                toValue: 1)
+            rightLine.add(reverseStrokeStart, forKey: "strokeEnd")
+            rightLine.add(reverseStrokeEnd, forKey: "strokeStart")
+        }
+        CATransaction.commit()
     }
     func startAnimation() {
         print("startAnimation")
+        CATransaction.begin()
         
-        if let ovalLayer = self.layer.first(name: "oval"),
-            ovalLayer.animation(forKey: "translationOval") == nil {
+        if let ovalLayer = self.layer.first(name: "oval")  {
+            ovalLayer.removeAllAnimations()
             let translate = CABasicAnimation.createAnimationLayer(
                 withDuration: 0.3,
                 delay: 0.3,
                 animationKeyPath: "path",
-                fromValue: nil,
+                fromValue: beginOvalPath.cgPath,
                 toValue: afterOvalPath.cgPath)
 
             let strokeStart = CABasicAnimation.createAnimationLayer(
                 withDuration: 0.35,
                 delay: 0.15,
                 animationKeyPath: "strokeStart",
-                fromValue: nil,
+                fromValue: 0,
                 toValue: 1)
             ovalLayer.add(translate, forKey: "translationOval")
             ovalLayer.add(strokeStart, forKey: "strokeStart")
         }
-        if let leftLine = self.layer.first(name: "left_line"), leftLine.animation(forKey: "strokeEnd") == nil {
+        if let leftLine = self.layer.first(name: "left_line") {
+            leftLine.removeAllAnimations()
             let strokeEnd = CABasicAnimation.createAnimationLayer(
                 withDuration: 0.3,
                 delay: 0.5,
@@ -108,7 +155,8 @@ class SearchCloseView: UIView {
                 toValue: 1)
             leftLine.add(strokeEnd, forKey: "strokeEnd")
         }
-        if let rightLine = self.layer.first(name: "right_line"), rightLine.animation(forKey: "stokeStart") == nil {
+        if let rightLine = self.layer.first(name: "right_line") {
+            rightLine.removeAllAnimations()
             let strokeStart = CABasicAnimation.createAnimationLayer(
                 withDuration: 0.5,
                 delay: 0.3,
@@ -124,6 +172,7 @@ class SearchCloseView: UIView {
             rightLine.add(strokeEnd, forKey: "strokeEnd")
             rightLine.add(strokeStart, forKey: "strokeStart")
         }
+        CATransaction.commit()
     }
     func toggle() {
         isSelected = !isSelected
